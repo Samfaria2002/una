@@ -5,10 +5,8 @@ import java.util.*;
 public class MiniJavaSemanticAnalyzer {
     private List<String> tokens;
     private Set<String> declaredVariables;
-    public int currentTokenIndex;
 
     public MiniJavaSemanticAnalyzer(List<String> tokens) {
-        this.currentTokenIndex = 0;
         this.tokens = tokens;
         this.declaredVariables = new HashSet<>();
     }
@@ -38,40 +36,30 @@ public class MiniJavaSemanticAnalyzer {
     }
 
     private void analyzeMethodDeclaration(int index) {
-        // Inicialmente, o índice aponta para a palavra-chave 'public'
         expect(index, "public");
-        parseType(index + 1); // O tipo de retorno do método
-        expect(index + 2, "IDENTIFIER"); // Nome do método
+        parseType(index + 1);
+        expect(index + 2, "IDENTIFIER");
         expect(index + 3, "(");
 
-        // Analisar a lista de parâmetros
-        int currentIndex = index + 4; // Avançar para o primeiro parâmetro (ou fechar parênteses, se não houver parâmetros)
+        int currentIndex = index + 4;
         if (!tokens.get(currentIndex).equals(")")) {
             while (true) {
-                parseType(currentIndex); // Tipo do parâmetro
-                expect(currentIndex + 1, "IDENTIFIER"); // Nome do parâmetro
-                currentIndex += 2; // Avançar para a próxima possível vírgula ou parêntese de fechamento
+                parseType(currentIndex);
+                expect(currentIndex + 1, "IDENTIFIER");
+                currentIndex += 2;
                 if (tokens.get(currentIndex).equals(")")) {
-                    break; // Parêntese de fechamento, sair do loop
+                    break;
                 } else if (!tokens.get(currentIndex).equals(",")) {
                     throw new RuntimeException("Erro de sintaxe: esperado ',' ou ')' mas encontrado " + tokens.get(currentIndex));
                 }
-                currentIndex++; // Avançar para o próximo parâmetro após a vírgula
+                currentIndex++;
             }
         }
 
-        // Parêntese de fechamento dos parâmetros
         expect(currentIndex, ")");
-
-        // Corpo do método (não implementado ainda)
-        // Aqui você pode adicionar a lógica para analisar o corpo do método, incluindo declarações de variáveis locais e instruções
-
-        // Por enquanto, apenas avançamos até o final do método
         while (!tokens.get(currentIndex).equals("}")) {
             currentIndex++;
         }
-
-        // Parêntese de fechamento do método
         expect(currentIndex, "}");
     }
 
